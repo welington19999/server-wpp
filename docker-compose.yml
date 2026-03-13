@@ -3,7 +3,16 @@ version: '3.8'
 services:
   whatsapp-boot:
     image: node:18-slim
-    command: bash -c "git clone https://github.com/welington19999/server-wpp.git /tmp/app && cp -r /tmp/app/* /app/ && cd /app && npm install && npm start"
+    command: >
+      bash -c "
+      apt-get update && 
+      apt-get install -y git && 
+      git clone https://github.com/welington19999/server-wpp.git /tmp/app && 
+      cp -r /tmp/app/* /app/ && 
+      cd /app && 
+      npm install && 
+      npm run start
+      "
     working_dir: /app
     ports:
       - "3000:3000"
@@ -13,19 +22,11 @@ services:
       - whatsapp-sessions:/app/sessions
       - wwwebjs-cache:/app/.wwwebjs_cache
     deploy:
+      mode: replicated
       replicas: 1
       restart_policy:
         condition: any
-      resources:
-        limits:
-          memory: 1g
-    networks:
-      - whatsapp-network
 
 volumes:
   whatsapp-sessions:
   wwwebjs-cache:
-
-networks:
-  whatsapp-network:
-    driver: overlay
