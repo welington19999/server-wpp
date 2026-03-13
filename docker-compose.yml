@@ -2,20 +2,30 @@ version: '3.8'
 
 services:
   whatsapp-boot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: whatsapp-boot-server
-    restart: unless-stopped
+    image: node:18-slim
+    command: bash -c "git clone https://github.com/welington19999/server-wpp.git /tmp/app && cp -r /tmp/app/* /app/ && cd /app && npm install && npm start"
+    working_dir: /app
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
     volumes:
-      - ./sessions:/app/sessions
-      - ./.wwwebjs_cache:/app/.wwwebjs_cache
-    env_file:
-      - .env
-    shm_size: 1gb
-    security_opt:
-      - seccomp:unconfined
+      - whatsapp-sessions:/app/sessions
+      - wwwebjs-cache:/app/.wwwebjs_cache
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 1g
+    networks:
+      - whatsapp-network
+
+volumes:
+  whatsapp-sessions:
+  wwwebjs-cache:
+
+networks:
+  whatsapp-network:
+    driver: overlay
