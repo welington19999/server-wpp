@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  whatsapp-boot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: whatsapp-boot-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./sessions:/app/sessions
+      - ./.wwwebjs_cache:/app/.wwwebjs_cache
+    env_file:
+      - .env
+    shm_size: 1gb
+    security_opt:
+      - seccomp:unconfined
